@@ -18,18 +18,18 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-#SECRET_KEY = os.environ.get("SECRET_KEY")
-SECRET_KEY = get_random_secret_key
+SECRET_KEY = os.environ.get("SECRET_KEY")
+#SECRET_KEY = get_random_secret_key
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-#DEBUG = os.environ.get("DEBUG", "False") == "true"
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "False") == "true"
+#DEBUG = True
 
 # Define your custom 404 error handler
 
-#ALLOWED_HOSTS = os.environ.get("ALLOWED_HOST").split(" ")
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOST").split(" ")
+#ALLOWED_HOSTS = ['*']
 
 
 CSRF_TRUSTED_ORIGINS = [
@@ -110,11 +110,11 @@ DATABASES = {
     }
 }
 
-#database_url = os.environ.get("DATABASE_URL")
-#DATABASES["default"] = dj_database_url.parse(database_url)
+database_url = os.environ.get("DATABASE_URL")
+DATABASES["default"] = dj_database_url.parse(database_url)
 
 
-#DATABASES["default"] = dj_database_url.parse('postgresql://ctfdatabase_user:GhC8fiwqUv2Pl9gMhFubt4pbAVYv6v1Q@dpg-ct82vgt2ng1s73f0gj00-a.oregon-postgres.render.com/ctfdatabase')
+#DATABASES["default"] = dj_database_url.parse('postgresql://capture_t_flag_user:NnzPLKrieIR2GGT14AMIy6rIt1Bn4H70@dpg-cus3m5tds78s73ed5n50-a.singapore-postgres.render.com/capture_t_flag')
 
 
 # Password validation
