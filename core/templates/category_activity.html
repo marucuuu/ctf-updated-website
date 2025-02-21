@@ -1,0 +1,373 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Pre-Test Activity</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Google Fonts - Poppins -->
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Font Awesome 6.0.0-beta3 CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="{% static 'new_template/css/style.css' %}">
+
+</head>
+
+<style>
+    .floating-alert {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1050; /* Ensure it appears above other elements */
+        width: 300px; /* Adjust width as needed */
+    }
+    .card-text {
+        max-height: 150px;
+        overflow-y: auto;
+    }
+    
+  </style>
+
+<body>
+
+    <audio id="notificationSound" src="{% static 'notification/notif_update.mp3' %}" preload="auto"></audio>
+    
+    <div class="wrapper d-flex align-items-stretch">
+        
+      <!-- NAVBAR  -->
+      {% include 'navbar/navbar_students.html' %}
+
+        <!-- Page Content  -->
+        <div id="content" class="p-4 p-md-5">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container-fluid">
+                    <button type="button" id="sidebarCollapse" class="btn btn-primary">
+                        <i class="fa fa-bars"></i>
+                        <span class="sr-only">Toggle Menu</span>
+                    </button>
+                    <button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <i class="fa fa-bars"></i>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="nav navbar-nav ml-auto">
+                            <li class="nav-item">
+                                <span class="navbar-text mr-3">Logged in as {{ request.user.username }}</span>
+                            </li>
+
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa fa-bell"></i>
+                                    <span class="badge bg-danger" id="notificationCount">{{ notifications|length }}</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown" style="width: 350px; max-height: 400px; overflow-y: auto;">
+                                    <li class="dropdown-header d-flex justify-content-between align-items-center">
+                                        <strong>Notifications</strong>
+                                        <a class="text-muted" href="#" id="markAllAsRead">Mark all as read</a>
+                                    </li>
+                                    <div id="notificationList">
+                                        {% for notification in notifications %}
+                                        <li class="dropdown-item {% if not notification.is_read %}bg-light{% endif %}" style="white-space: normal; word-wrap: break-word; word-break: break-word;">
+                                            <p class="mb-1">
+                                                <strong>From: {{ notification.sender.username }}</strong><br>
+                                                {{ notification.message }}
+                                            </p>
+                                            <small class="text-muted">{{ notification.created_at }}</small>
+                                        </li>
+                                        {% empty %}
+                                        <li class="dropdown-item">No notifications.</li>
+                                        {% endfor %}
+                                    </div>
+                                </ul>
+                            </li>
+                            
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+            
+            <div class="container mt-4">
+                <h2 class="mb-4">Practice Activities</h2>
+            
+                <!-- General Description for Lessons -->
+                <div class="mb-4">
+                    <p>Welcome to the Activity section! Here you can find a variety of activities categorized. Lessons that you've completed will be displayed here, so you need to read everything on the lesson module.</p>
+                </div>
+            
+                <!-- Loop through the list of categories and their activities -->
+                {% for category, activities in activities_by_category_list %}
+                    <h3>{{ category }}</h3>
+            
+                    <!-- Check if this category has unread lessons -->
+                    {% if category in categories_with_unread_lessons %}
+                        <div class="alert alert-warning">
+                            You need to read all lessons in this category and mark as done before accessing activities.
+                        </div>
+                    {% else %}
+                        <div class="row">
+                            <!-- Loop through activities for the current category -->
+                            {% for activity in activities %}
+                                <div class="col-md-4 mb-4">
+                                    <div class="card border-primary shadow-sm" style="height: 100%;">
+                                        <div class="card-body d-flex flex-column">
+                                            <!-- Scrollable question area -->
+                                            <div class="card-text flex-grow-1 overflow-auto" style="max-height: 150px;">
+                                                {{ activity.question|safe }}
+                                            </div>
+            
+                                            {% if activity.activity_type == 'mcq' %}
+                                                <!-- Multiple Choice (MCQ) Activity -->
+                                                {% for fb in feedback %}
+                                                    {% if fb.activity_id == activity.id %}
+                                                        <div class="feedback-message mt-3">
+                                                            {% if fb.message == "Your answer is correct!" %}
+                                                                <span class="text-success">{{ fb.message }}</span>
+                                                            {% elif fb.message == "Incorrect answer. Please try again." %}
+                                                                <span class="text-danger">{{ fb.message }}</span>
+                                                            {% endif %}
+                                                        </div>
+                                                    {% endif %}
+                                                {% endfor %}
+                                                {% if activity.id not in answered_activity_ids %}
+                                                    <!-- If the student hasn't answered yet, show MCQ choices -->
+                                                    <form method="POST">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="activity_id" value="{{ activity.id }}">
+                                                        <div class="form-group">
+                                                            <label for="answer">Choose the correct answer</label>
+                                                            <div>
+                                                                <label>
+                                                                    <input type="radio" name="answer" value="a" required> {{ activity.option_a }}
+                                                                </label>
+                                                            </div>
+                                                            <div>
+                                                                <label>
+                                                                    <input type="radio" name="answer" value="b" required> {{ activity.option_b }}
+                                                                </label>
+                                                            </div>
+                                                            <div>
+                                                                <label>
+                                                                    <input type="radio" name="answer" value="c" required> {{ activity.option_c }}
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        <button type="submit" class="btn btn-success mt-3">Submit Answer</button>
+                                                    </form>
+                                                {% else %}
+                                                    <!-- If the student has already answered, allow them to try again if the answer is incorrect -->
+                                                    {% for fb in feedback %}
+                                                        {% if fb.activity_id == activity.id %}
+                                                            {% if fb.message == "Incorrect answer. Please try again." %}
+                                                                <form method="POST">
+                                                                    {% csrf_token %}
+                                                                    <input type="hidden" name="activity_id" value="{{ activity.id }}">
+                                                                    <div class="form-group">
+                                                                        <label for="answer">Choose the correct answer</label>
+                                                                        <div>
+                                                                            <label>
+                                                                                <input type="radio" name="answer" value="a" required> {{ activity.option_a }}
+                                                                            </label>
+                                                                        </div>
+                                                                        <div>
+                                                                            <label>
+                                                                                <input type="radio" name="answer" value="b" required> {{ activity.option_b }}
+                                                                            </label>
+                                                                        </div>
+                                                                        <div>
+                                                                            <label>
+                                                                                <input type="radio" name="answer" value="c" required> {{ activity.option_c }}
+                                                                            </label>
+                                                                        </div>
+                                                                    </div>
+                                                                    <button type="submit" class="btn btn-warning mt-3">Try Again</button>
+                                                                </form>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {% endif %}
+                                            {% else %}
+                                                <!-- Identification Activity -->
+                                                {% if activity.id not in answered_activity_ids %}
+                                                    <form method="POST">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="activity_id" value="{{ activity.id }}">
+                                                        <div class="form-group">
+                                                            <label for="answer">Your Answer</label>
+                                                            <input type="text" name="answer" id="answer" class="form-control" required>
+                                                        </div>
+                                                        <button type="submit" class="btn btn-success mt-3">Submit Answer</button>
+                                                    </form>
+                                                {% else %}
+                                                    <!-- Show feedback for answered activity -->
+                                                    {% for fb in feedback %}
+                                                        {% if fb.activity_id == activity.id %}
+                                                            <div class="feedback-message mt-3">
+                                                                {% if fb.message == "Your answer is correct!" %}
+                                                                    <span class="text-success">{{ fb.message }}</span>
+                                                                {% elif fb.message == "Incorrect answer. Please try again." %}
+                                                                    <span class="text-danger">{{ fb.message }}</span>
+                                                                    <form method="POST">
+                                                                        {% csrf_token %}
+                                                                        <input type="hidden" name="activity_id" value="{{ activity.id }}">
+                                                                        <div class="form-group">
+                                                                            <label for="answer">Your Answer</label>
+                                                                            <input type="text" name="answer" id="answer" class="form-control" required>
+                                                                        </div>
+                                                                        <button type="submit" class="btn btn-warning mt-3">Try Again</button>
+                                                                    </form>
+                                                                {% endif %}
+                                                            </div>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {% endif %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            
+            
+                      
+            
+                          
+            
+            {% include 'notification/student_notification.html' %}
+
+            
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {  
+                    // WebSocket URL (Use wss if the site uses HTTPS)
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+        let notificationSocket = createWebSocketConnection();
+        let reconnectInterval;
+
+        // Function to establish WebSocket connection
+        function createWebSocketConnection() {
+            const socket = new WebSocket(
+                `${wsProtocol}://${window.location.host}/ws/notifications/`
+            );
+
+            // Handle incoming WebSocket messages
+            socket.onmessage = function (e) {
+                const data = JSON.parse(e.data);
+                const notificationList = document.getElementById('notificationList');
+                if (!notificationList) return; // Exit if notification list is not available
+
+                // Create new notification element
+                const newNotification = document.createElement('li');
+                newNotification.classList.add('dropdown-item');
+                newNotification.style.whiteSpace = 'normal';  // Ensure text wraps
+                newNotification.style.wordBreak = 'break-word'; // Prevent horizontal scroll
+
+                newNotification.innerHTML = `
+                    <p class="mb-1">
+                        <strong>From: ${data.sender}</strong><br>${data.message}
+                    </p>
+                    <small class="text-muted">${new Date(data.created_at).toLocaleString()}</small>
+                `;
+
+                // Add new notification to the top of the list
+                notificationList.prepend(newNotification);
+
+                // Update the notification count
+                const notificationCount = document.getElementById('notificationCount');
+                if (notificationCount) {
+                    notificationCount.textContent = parseInt(notificationCount.textContent) + 1;
+                }
+
+                // Play the notification sound
+                const notificationSound = document.getElementById('notificationSound');
+                if (notificationSound) {
+                    notificationSound.play();
+                }
+            };
+
+            // WebSocket onclose event with reconnection logic
+            socket.onclose = function (e) {
+                console.error('Notification socket closed unexpectedly. Attempting to reconnect...');
+                if (!reconnectInterval) {
+                    reconnectInterval = setInterval(function () {
+                        console.log('Reconnecting WebSocket...');
+                        notificationSocket = createWebSocketConnection();
+                    }, 5000);  // Try to reconnect every 5 seconds
+                }
+            };
+
+            // On successful connection, clear the reconnect interval
+            socket.onopen = function () {
+                console.log('WebSocket connection established.');
+                clearInterval(reconnectInterval);
+                reconnectInterval = null;  // Reset the interval
+            };
+
+            return socket;
+        }
+
+        // Mark all notifications as read
+        document.getElementById('markAllAsRead')?.addEventListener('click', function (e) {
+            e.preventDefault();
+            fetch("{% url 'mark_all_notifications_as_read' %}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({})
+            }).then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update the notification count to 0
+                        const notificationCount = document.getElementById('notificationCount');
+                        if (notificationCount) {
+                            notificationCount.innerText = '0';
+                        }
+                        // Remove highlight from the notification list
+                        document.querySelectorAll('#notificationList .dropdown-item').forEach(item => {
+                            item.classList.remove('bg-light');
+                        });
+                    }
+                }).catch(error => {
+                    console.error('Error marking notifications as read:', error);
+                });
+        });
+
+        // Update notification count on page load
+        function updateNotificationCount() {
+            fetch("{% url 'notifications_count' %}")
+                .then(response => response.json())
+                .then(data => {
+                    const notificationCount = document.getElementById('notificationCount');
+                    if (notificationCount) {
+                        notificationCount.innerText = data.unread_count;
+                    }
+                }).catch(error => {
+                    console.error('Error updating notification count:', error);
+                });
+        }
+
+        // Call the function to initialize count on page load
+        updateNotificationCount();
+    });
+            </script>
+
+            <!-- Bootstrap Bundle with Popper -->
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="{% static 'new_template/js/jquery.min.js' %}"></script>
+            <script src="{% static 'new_template/js/popper.js' %}"></script>
+            <script src="{% static 'new_template/js/bootstrap.min.js' %}"></script>
+            <script src="{% static 'new_template/js/main.js' %}"></script>
+</body>
+</html>

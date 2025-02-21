@@ -1,0 +1,56 @@
+{% load static %}
+
+<nav class="navbar default-layout col-lg-12 col-12 p-0 fixed-top d-flex align-items-top flex-row">
+    <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-start">
+      <div class="me-3">
+        <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-bs-toggle="minimize">
+          <span class="icon-menu"></span>
+        </button>
+      </div>
+      <div>
+        <a class="navbar-brand brand-logo" href="{% url 'dashboard' %}">
+          <img src="{% if config.logo %}{{ config.logo.url }}{% else %}{% static 'default_logo.png' %}{% endif %}" alt="logo" style="max-height: 50px;" />
+      </a>
+      <a class="navbar-brand brand-logo-mini" href="{% url 'dashboard' %}">
+          <img src="{% if config.logo %}{{ config.logo.url }}{% else %}{% static 'default_logo_mini.png' %}{% endif %}" alt="logo" style="max-height: 30px;" />
+      </a>
+      </div>
+    </div>
+    <div class="navbar-menu-wrapper d-flex align-items-top">
+      <ul class="navbar-nav">
+        <li class="nav-item fw-semibold d-none d-lg-block ms-0">
+          <h1 class="welcome-text">{{ greeting_message }}, <span class="text-black fw-bold">{{ request.user.username }}</span></h1>
+        </li>
+      </ul>
+      <ul class="navbar-nav ms-auto">  
+        <li class="nav-item dropdown d-none d-lg-block user-dropdown">
+            <a class="nav-link text-decoration-none fw-bold text-primary" id="UserDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                {% if request.user.userprofile.profile_picture %}
+                    <img src="{{ request.user.userprofile.profile_picture.url }}" alt="Profile Picture" class="rounded-circle" style="width: 40px; height: 40px; margin-right: 10px;">
+                {% else %}
+                    <i class="mdi mdi-account-circle-outline text-primary me-2"></i>
+                {% endif %}
+                {{ request.user.first_name }}</span></span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right navbar-dropdown shadow-lg border-0" aria-labelledby="UserDropdown">
+                <div class="dropdown-header text-center py-3">
+                    <h6 class="fw-semibold mb-0">{{ request.user.username }}</h6>
+                    <p class="text-muted small mb-0">{{ request.user.email }}</p>
+                </div>
+                <div class="dropdown-divider"></div>
+                <form method="POST" action="{% url 'logout' %}" class="d-inline">
+                    {% csrf_token %}
+                    <a href="#" class="dropdown-item text-danger fw-bold" onclick="event.preventDefault(); this.closest('form').submit();">
+                        <i class="dropdown-item-icon mdi mdi-power me-2"></i> Sign Out
+                    </a>
+                    <button type="submit" class="d-none"></button>
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+      <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-bs-toggle="offcanvas">
+        <span class="mdi mdi-menu"></span>
+      </button>
+    </div>
+  </nav>

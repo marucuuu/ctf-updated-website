@@ -1,0 +1,224 @@
+                <!-- Edit Team Modal -->
+                <div class="modal fade" id="editTeamModal" tabindex="-1" aria-labelledby="editTeamModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editTeamModalLabel">Edit User Teams</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="editTeamForm" method="post" action="{% url 'edit_user_teams' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="user_id" id="user_id">
+                                    <div class="form-group">
+                                        <label for="teams">Teams</label>
+                                        <select multiple class="form-control" id="teams" name="teams">
+                                            {% for team in teams %}
+                                            <option value="{{ team.id }}">{{ team.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Save changes</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Remove Team Modal -->
+                <div class="modal fade" id="removeUserFromTeamModal" tabindex="-1" aria-labelledby="removeUserFromTeamModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="removeUserFromTeamModalLabel">Remove User from Team</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body" id="removeModalBody">
+                                <form id="removeUserFromTeamForm" method="post" action="{% url 'remove_user_from_team' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="user_id" id="remove_user_id">
+                                    <div class="form-group">
+                                        <label for="remove_team">Select Team</label>
+                                        <select class="form-control" id="remove_team" name="team_id">
+                                            <!-- Options will be populated by JavaScript -->
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-danger">Remove User</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+               <!-- Edit Verification Modal -->
+                <div class="modal fade" id="changeVerificationStatusModal" tabindex="-1" aria-labelledby="changeVerificationStatusModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="changeVerificationStatusModalLabel">Change Verification Status</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="changeVerificationStatusForm" method="post" action="{% url 'change_verification_status' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="user_id" id="verification_user_id">
+                                    <div class="form-group">
+                                        <label for="verification_status">Verification Status</label>
+                                        <select class="form-control" id="verification_status" name="verification_status">
+                                            <option value="True">Verified</option>
+                                            <option value="False">Not Verified</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-info">Save changes</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Edit Section Modal -->
+<div class="modal fade" id="editSectionModal" tabindex="-1" aria-labelledby="editSectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editSectionModalLabel">Edit User Section</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editSectionForm" method="post" action="{% url 'edit_user_section' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_id" id="user_id">
+                    <div class="form-group">
+                        <label for="section">Section</label>
+                        <input type="text" class="form-control" id="section" name="section">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+                
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var editTeamModal = document.getElementById('editTeamModal');
+        var removeUserFromTeamModal = document.getElementById('removeUserFromTeamModal');
+        var userTeams = {{ user_teams|safe }};  // This is the user_teams data passed from Django template
+        var changeVerificationStatusModal = document.getElementById('changeVerificationStatusModal');
+        var editSectionModal = document.getElementById('editSectionModal');
+        var userIdInput = document.getElementById('user_id');
+        var sectionInput = document.getElementById('section');
+        var sectionForm = document.getElementById('editSectionForm');
+    
+        // Handle Change Verification Status
+        changeVerificationStatusModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var userId = button.getAttribute('data-user-id');
+            var isVerified = button.getAttribute('data-verified');
+            var verificationUserIdInput = document.getElementById('verification_user_id');
+            var verificationStatusSelect = document.getElementById('verification_status');
+            
+            verificationUserIdInput.value = userId;
+            verificationStatusSelect.value = isVerified === 'True' ? 'True' : 'False';
+        });
+    
+        // Handle Edit Teams Modal
+        editTeamModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var userId = button.getAttribute('data-user-id');
+            userIdInput.value = userId;
+        });
+    
+        // When the edit section modal is opened, populate the section input field
+        editSectionModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget; // Button that triggered the modal
+            var userId = button.getAttribute('data-user-id'); // Get user ID
+            var section = button.getAttribute('data-section'); // Get current section
+    
+            var userIdInput = document.getElementById('user_id');
+            var sectionInput = document.getElementById('section');
+    
+            // Ensure user_id is set correctly
+            if (userId) {
+                userIdInput.value = userId;  // Set the user ID in the hidden input
+            } else {
+                console.error("User ID is missing.");
+            }
+    
+            // Set the current section in the input field
+            sectionInput.value = section;  
+        });
+    
+        // Handle the form submission (AJAX request) to update the user's section
+        sectionForm.addEventListener('submit', function(event) {
+            event.preventDefault();  // Prevent the default form submission
+        
+            console.log('Form submitted'); // Add this to check if the submit event is being triggered.
+        
+            var userId = document.getElementById('user_id').value;
+            var section = document.getElementById('section').value;
+        
+            // Validate input
+            if (!userId || !section) {
+                alert('Please provide a valid user ID and section.');
+                return;
+            }
+        
+            fetch('{% url "edit_user_section" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    'user_id': userId,
+                    'section': section
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);  // Log the response data
+                if (data.success) {
+                    alert('Section updated successfully!');
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            })
+            .catch(error => {
+                alert('Something went wrong: ' + error);
+            });
+        });
+    
+        // Handle Remove User from Team Modal
+        removeUserFromTeamModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var userId = button.getAttribute('data-user-id');
+            var userIdInput = document.getElementById('remove_user_id');
+            var removeTeamSelect = document.getElementById('remove_team');
+            var removeModalBody = document.getElementById('removeModalBody');
+            var removeUserFromTeamForm = document.getElementById('removeUserFromTeamForm');
+            
+            userIdInput.value = userId;
+            
+            // Clear existing options
+            removeTeamSelect.innerHTML = '';
+            
+            // Populate select options with user's teams
+            var teams = userTeams[userId];
+            if (teams.length > 0) {
+                removeModalBody.innerHTML = ''; // Clear any error message
+                removeModalBody.appendChild(removeUserFromTeamForm); // Ensure form is in the modal body
+                
+                teams.forEach(function (team) {
+                    var option = document.createElement('option');
+                    option.value = team.id;
+                    option.textContent = team.name;
+                    removeTeamSelect.appendChild(option);
+                });
+            } else {
+                // Display error message
+                removeModalBody.innerHTML = '<p class="text-danger">No teams available for this user.</p>';
+            }
+        });
+    });    
+</script>

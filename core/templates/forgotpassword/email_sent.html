@@ -1,0 +1,57 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Password Reset Email Sent</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{% static 'new_template/css/style.css' %}">
+</head>
+<body>
+
+<div class="wrapper d-flex align-items-stretch">
+
+    <!-- Page Content -->
+    <div id="content" class="p-4 p-md-5">
+
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <i class="fa fa-bars"></i>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent"></div>
+            </div>
+        </nav>
+
+        <div class="d-flex justify-content-center align-items-center">
+            <div class="col-xxl-4 col-xl-5 col-lg-6 col-md-8 col-sm-10">
+                <div class="card shadow-lg">
+                    <div class="card-body p-5">
+                        <h1>Password Reset Email Sent</h1>
+                        <p>An email has been sent to {{ email }} with instructions to reset your password.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="{% static 'new_template/js/jquery.min.js' %}"></script>
+<script src="{% static 'new_template/js/popper.js' %}"></script>
+<script src="{% static 'new_template/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'new_template/js/main.js' %}"></script>
+<script>
+    // Add this script to toggle the no-scroll class when login is visible
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelector('form').addEventListener('submit', function() {
+            document.body.classList.add('no-scroll');
+        });
+    });
+</script>
+
+</body>
+</html>

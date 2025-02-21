@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Our Platform</title>
+    <style>
+        /* Email container styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #111;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            width: 100%;
+            background-color: #111;
+            padding: 20px 0;
+        }
+        .email-card {
+            background-color: #1c1c1c;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            color: #fff;
+        }
+        .email-header {
+            text-align: center;
+            padding-bottom: 20px;
+        }
+        .email-header h1 {
+            color: #ffc107;
+            font-size: 24px;
+        }
+        .email-body {
+            text-align: left;
+            padding-bottom: 20px;
+        }
+        .email-body p, .email-body ul {
+            color: #ccc;
+            line-height: 1.6;
+        }
+        .email-body ul {
+            padding-left: 20px;
+        }
+        .email-body li {
+            margin-bottom: 10px;
+        }
+        .change-password-link {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: #ffc107;
+            color: #111;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .change-password-link:hover {
+            background-color: #e0a800;
+        }
+        .email-footer {
+            text-align: center;
+            padding-top: 20px;
+            color: #888;
+        }
+        .email-footer p {
+            color: #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-card">
+            <div class="email-header">
+                <h1>Welcome to Our Platform</h1>
+            </div>
+            <div class="email-body">
+                <p>Dear {{ user.username }},</p>
+                <p>Welcome to our platform! Your account has been created.</p>
+                <p>Here are your login credentials:</p>
+                <ul>
+                    <li><strong>Username:</strong> {{ user.username }}</li>
+                    <li><strong>Temporary Password:</strong> {{ temporary_password }}</li>
+                </ul>
+                <p>Please log in using the above credentials and change your password immediately.</p>
+            <div class="email-footer">
+                <p>Best regards,<br>The Team</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!-- partial:partials/_sidebar.html -->
+<nav class="sidebar sidebar-offcanvas" id="sidebar">
+  <ul class="nav">
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'dashboard' %}">
+        <i class="mdi mdi-view-dashboard menu-icon"></i>
+        <span class="menu-title">Dashboard</span>
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
+        <i class="menu-icon mdi mdi-bell-ring"></i>
+        <span class="menu-title">Notifications</span>
+        <i class="menu-arrow"></i>
+      </a>
+      <div class="collapse" id="ui-basic">
+        <ul class="nav flex-column sub-menu">
+          <li class="nav-item"><a class="nav-link" href="{% url 'notification' %}">Send Notification</a></li>
+        </ul>
+      </div>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="collapse" href="#form-elements" aria-expanded="false" aria-controls="form-elements">
+        <i class="menu-icon mdi mdi-plus-circle-outline"></i>
+        {% if user.userprofile.role == 'admin' %}
+          <span class="menu-title">User Management</span>
+        {% else %}
+          <span class="menu-title">Add Data</span>
+        {% endif %}
+        <i class="menu-arrow"></i>
+      </a>
+      <div class="collapse" id="form-elements">
+        <ul class="nav flex-column sub-menu">
+          {% if user.userprofile.role == 'professor' %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'lesson' %}">Add Lesson</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'add_activity' %}">Add Activity Category</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'challenges' %}">Add Challenges</a></li>
+          {% endif %}
+
+          <!-- Add User link only for 'admin' role -->
+          {% if user.userprofile.role == 'admin' %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'prof_user' %}">Add User</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'teams' %}">Add Teams</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'view_user' %}">Users List</a></li>
+          {% endif %}
+        </ul>
+      </div>
+    </li>
+
+    {% if user.userprofile.role == 'professor' %}
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'view_lessons' %}">
+        <i class="menu-icon mdi mdi-book-open-page-variant"></i>
+        <span class="menu-title">View Lessons</span>
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'view_activity' %}">
+        <i class="menu-icon mdi mdi-file-document-outline"></i> <!-- Updated icon -->
+        <span class="menu-title">View Lesson Activity</span>
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'view_challenges' %}">
+        <i class="menu-icon mdi mdi-help-circle-outline"></i>
+        <span class="menu-title">View Challenges</span>
+      </a>
+    </li>
+
+    {% endif %}
+
+    {% if user.userprofile.role == 'admin' %}
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'history_logs' %}">
+        <i class="menu-icon mdi mdi-history"></i>
+        <span class="menu-title">History Logs</span>
+      </a>
+    </li>
+    {% endif %}
+
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'configuration' %}">
+        <i class="menu-icon mdi mdi-cog"></i>
+        <span class="menu-title">Configuration</span>
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'profile_settings' %}">
+          <i class="menu-icon mdi mdi-account"></i> <!-- Changed logo class to 'mdi-account' -->
+          <span class="menu-title">Profile Information</span>
+      </a>
+  </li>
+  
+
+  </ul>
+</nav>
+<!-- partial -->

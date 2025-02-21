@@ -1,0 +1,142 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Verify Account</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{% static 'new_template/css/style.css' %}">
+    <style>
+        .floating-alert {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1050; /* Ensure it appears above other elements */
+            width: 300px; /* Adjust width as needed */
+        }
+      </style>
+</head>
+<body>
+
+<div class="wrapper d-flex align-items-stretch">
+    <nav id="sidebar">
+        <div class="p-4 pt-5">
+            <a href="{% url 'login' %}" class="img logo rounded-circle mb-5" style="background-image: url('{% static "new_template/images/logo.svg" %}');"></a>
+        </div>
+    </nav>
+
+     <!-- Page Content -->
+     <div id="content" class="d-flex justify-content-center align-items-center flex-fill p-4 p-md-5">
+        <div class="w-100">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                    <div class="card shadow-lg">
+                        <div class="card-body p-5">
+                            <form method="POST" class="needs-validation" novalidate="" autocomplete="off">
+                                {% csrf_token %}
+                                
+                                <!-- Instructional Text -->
+                                <div class="mb-4">
+                                    <p class="text-muted">Please enter the verification code sent to your email address.</p>
+                                </div>
+                                
+                                <!-- Verification Code Input Field -->
+                                <div class="mb-3">
+                                    <label class="mb-2 text-muted" for="verification_code">Verification Code:</label>
+                                    <input id="verification_code" type="text" class="form-control" name="verification_code" required autofocus
+                                    pattern="\d{6}" title="Please enter a 6-digit verification code">
+                                    <div class="invalid-feedback">
+                                        {{ form.errors.verification_code|striptags }}
+                                    </div>
+                                </div>
+                                
+                                <!-- Submit Button and Resend Button -->
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <!-- Submit Button -->
+                                    <button type="submit" class="btn btn-primary">Verify</button>
+                                     </form>
+                                    <!-- Resend Verification Code Button -->
+                                    <form method="POST" class="mb-0">
+                                        {% csrf_token %}
+                                        <button type="submit" name="resend_code" class="btn btn-secondary">Resend Verification Code</button>
+                                    </form>
+                                </div>
+                                
+                                <!-- Expiration Time Display -->
+                                <div id="expiration_time" class="mt-3">
+                                    <!-- Placeholder for expiration time message -->
+                                </div>
+                        
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Floating Notification -->
+    {% if messages %}
+    <div class="floating-alert">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Auto-close the alert after 5 seconds (5000ms)
+        setTimeout(function() {
+            var alertElement = document.querySelector('.floating-alert .alert');
+            if (alertElement) {
+                var alert = new bootstrap.Alert(alertElement);
+                alert.close();
+            }
+        }, 5000);
+    
+        // Get the verification code sent at timestamp from the template
+        const codeSentAt = parseInt("{{ verification_code_sent_at|date:'U' }}", 10); // UNIX timestamp
+        const expirationMinutes = 1; // Change this if your expiration time is different
+    
+        if (isNaN(codeSentAt)) {
+            document.getElementById('expiration_time').innerText = 'Invalid timestamp.';
+            return;
+        }
+    
+        const expirationTime = new Date(codeSentAt * 1000 + expirationMinutes * 60 * 1000); // Expiration time in milliseconds
+    
+        function updateCountdown() {
+            const now = new Date(); // Update current time every second
+            const remainingTime = expirationTime - now;
+    
+            if (remainingTime <= 0) {
+                document.getElementById('expiration_time').innerText = 'The verification code has expired.';
+            } else {
+                const minutes = Math.floor(remainingTime / (60 * 1000));
+                const seconds = Math.floor((remainingTime % (60 * 1000)) / 1000);
+                document.getElementById('expiration_time').innerText = `Verification code expires in ${minutes} minute and ${seconds} seconds.`;
+                setTimeout(updateCountdown, 1000); // Update every second
+            }
+        }
+    
+        updateCountdown(); // Start the countdown
+    });
+    </script>
+    
+    
+
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+      <script src="{% static 'new_template/js/jquery.min.js' %}"></script>
+      <script src="{% static 'new_template/js/popper.js' %}"></script>
+      <script src="{% static 'new_template/js/bootstrap.min.js' %}"></script>
+      <script src="{% static 'new_template/js/main.js' %}"></script>
+
+</body>
+</html>

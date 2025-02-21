@@ -1,0 +1,58 @@
+{% load static %}
+
+<nav id="sidebar">
+    <div class="p-4 pt-5">
+            <a href="#" class="img logo rounded-circle mb-5" 
+                style="background-image: url('{% if config.logo %}{{ config.logo.url }}{% else %}{% static 'default_logo.png' %}{% endif %}'); 
+                background-size: cover; background-position: center; width: 150px; height: 150px;">
+            </a>
+        <ul class="list-unstyled components">
+            <li>
+                <a href="{% url 'student_dashboard' %}">
+                    <i class="bi bi-speedometer2"></i> Student Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'lessons' %}">
+                    <i class="bi bi-journal-text"></i> Lesson
+                </a>
+            </li>
+
+           <li>
+                <a href="{% url 'categories_activity' %}">
+                    <i class="bi bi-grid-3x3-gap"></i> Practice Test Activities
+                </a>
+           </li>
+
+            <li>
+                <a href="{% url 'join_team' %}">
+                    <i class="bi bi-people"></i> Teams
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'challenges_student' %}">
+                    <i class="bi bi-trophy"></i> Challenges
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'profile' %}">
+                    <i class="bi bi-person-circle"></i> Profile Settings
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'faqs' %}">
+                    <i class="bi bi-question-circle"></i> FAQ's
+                </a>
+            </li>
+            <li class="mt-auto">
+                <form method="POST" action="{% url 'logout' %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger w-100 text-left">
+                        <i class="bi bi-box-arrow-right"></i> Sign Out
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </div>
+</nav>
+

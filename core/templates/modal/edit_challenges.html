@@ -1,0 +1,220 @@
+{% load static %}
+ 
+<!-- Edit Challenge Modal -->
+<div class="modal fade" id="editChallengeModal" tabindex="-1" aria-labelledby="editChallengeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg"> <!-- Larger width for better layout -->
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="editChallengeModalLabel">
+                  <i class="fas fa-pencil-alt"></i> Edit Challenge
+              </h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form id="editChallengeForm" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="id_section" class="form-label">Section</label>
+                        <select class="form-control" id="id_section" name="section">
+                            {% for section_value, section_label in section_choices %}
+                                <option value="{{ section_value }}" {% if section_value == form.section.value %}selected{% endif %}>{{ section_label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="id_name" class="form-label">Name of the Challenge <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="id_name" name="name" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="id_category" class="form-label">Category of the Challenge</label>
+                        <select class="form-control" id="id_category" name="category">
+                            <option value="general">General</option>
+                            <option value="cryptography">Cryptography</option>
+                            <option value="forensics">Forensics</option>
+                            <option value="osint">Open Source Intelligence</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label for="id_content" class="form-label">Content</label> <!-- Changed from Description to Content -->
+                        <textarea class="form-control" id="id_content" name="content" rows="3"></textarea> <!-- Updated name -->
+                    </div>
+                    <div class="col-md-6">
+                        <label for="id_link" class="form-label">Link Uploader</label>
+                        <input type="url" class="form-control" id="id_link" name="link" placeholder="https://example.com">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="id_deadline" class="form-label">Deadline <span class="text-danger">*</span></label>
+                        <input type="datetime-local" class="form-control" id="id_deadline" name="deadline" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="id_hints" class="form-label">Hints</label>
+                        <textarea id="id_hints" name="hints" class="form-control" rows="5" placeholder="Enter hints, each on a new line" oninput="processHints(this.value)"></textarea>
+                        <div id="hintList" class="mt-2"></div> <!-- Hints will be displayed here -->
+                    </div>
+                    <div class="col-md-6">
+                        <label for="id_points" class="form-label">Points <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="id_points" name="points" min="0" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="id_flag" class="form-label">Flag Answer <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="id_flag" name="flag" required>
+                    </div>
+                    <div class="col-md-6 d-flex align-items-center">
+                        <div class="form-check mt-4 ms-4">
+                            <input type="checkbox" class="form-check-input" id="id_visible" name="visible">
+                            <label class="form-check-label ms-1" for="id_visible">Visible to Students</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="id_scoring_type" class="form-label">Scoring Type</label>
+                        <select class="form-select" id="id_scoring_type" name="scoring_type">
+                            <option value="individual">Individual</option>
+                            <option value="team">Team</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label for="id_file" class="form-label">File Uploader</label>
+                        <input type="file" class="form-control" id="id_file" name="file" accept=".zip,.rar,.7z,.tar.gz">
+                        <small class="form-text text-muted">Allowed file types: .zip, .rar, .7z, .tar.gz</small>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+      </div>
+  </div>
+</div>
+
+<!-- Delete Challenge Modal -->
+<div class="modal fade" id="deleteChallengeModal" tabindex="-1" aria-labelledby="deleteChallengeModalLabel" aria-hidden="true">
+  <div class="modal-dialog"> <!-- Default width is sufficient for confirmation -->
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="deleteChallengeModalLabel">Confirm Deletion</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form id="deleteChallengeForm" method="POST">
+              {% csrf_token %}
+              <div class="modal-body">
+                  <p>Are you sure you want to delete this challenge? This action cannot be undone.</p>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                  <button type="submit" class="btn btn-danger">Confirm Delete</button>
+              </div>
+          </form>
+      </div>
+  </div>
+</div>
+
+{% include 'tinymce/api.html'%}
+
+<script>
+    function processHints(hintsText) {
+        // Assuming hints are separated by new lines
+        let hints = hintsText.split("\n").filter(hint => hint.trim() !== "");
+        let hintListDiv = document.getElementById("hintList");
+
+        // Clear the previous hints list
+        hintListDiv.innerHTML = "";
+
+        // Dynamically create the list of hints
+        hints.forEach(function(hint, index) {
+            let hintItem = document.createElement("div");
+            hintItem.innerHTML = `<strong>Hint ${index + 1}:</strong> ${hint}`;
+            hintListDiv.appendChild(hintItem);
+        });
+    }
+</script>
+<script>
+    tinymce.init({
+        selector: '#id_content',  // Match this to the textarea ID
+        menubar: false,
+        plugins: [
+                'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount',
+                'checklist', 'mediaembed', 'casechange', 'export', 'formatpainter', 'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen', 'powerpaste', 'advtable', 'advcode', 'editimage', 'advtemplate', // Removed 'ai' and 'tinycomments'
+                'inlinecss', 'markdown', // Added these as examples; remove if not needed
+            ],
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | removeformat | align lineheight | checklist numlist bullist indent outdent | emoticons charmap',
+        height: 300,
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var editModal = document.getElementById('editChallengeModal');
+        var deleteModal = document.getElementById('deleteChallengeModal');
+        
+        // Fetch sections for the dropdown
+        function fetchSections() {
+            return fetch('/api/sections/')
+                .then(response => response.json())
+                .then(data => {
+                    const sectionSelect = document.getElementById('id_section');
+                    sectionSelect.innerHTML = '';  // Clear existing options
+                    
+                    // Create a default "No Section" option
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = '';
+                    defaultOption.textContent = 'No Section';
+                    sectionSelect.appendChild(defaultOption);
+    
+                    // Populate the dropdown with available sections
+                    data.sections.forEach(section => {
+                        const option = document.createElement('option');
+                        option.value = section;
+                        option.textContent = section;
+                        sectionSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching sections:', error);
+                    // Optionally, display an error message to the user
+                });
+        }
+    
+        editModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var challengeId = button.getAttribute('data-challenge-id');
+            var form = document.getElementById('editChallengeForm');
+            form.action = '/edit_challenge/' + challengeId + '/'; // Update the form action URL
+        
+            // Fetch sections for the dropdown before populating the form
+            fetchSections().then(() => {
+                // Fetch the challenge data and populate the form
+                fetch(`/api/challenges/${challengeId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        form.querySelector('#id_name').value = data.name || '';
+                        form.querySelector('#id_category').value = data.category || '';
+                        tinymce.get('id_content').setContent(data.content || '');
+                        form.querySelector('#id_link').value = data.link || '';
+                        form.querySelector('#id_points').value = data.points || 0;
+                        form.querySelector('#id_flag').value = data.flag || '';
+                        form.querySelector('#id_visible').checked = data.visible || false;
+                        form.querySelector('#id_deadline').value = data.deadline ? new Date(data.deadline).toISOString().slice(0, 16) : '';
+                        form.querySelector('#id_scoring_type').value = data.scoring_type || 'individual';
+                        form.querySelector('#id_section').value = data.section || '';
+                    })
+                    .catch(error => {
+                        console.error('Error fetching challenge data:', error);
+                    });
+            });
+        });
+        
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var challengeId = button.getAttribute('data-challenge-id');
+            var form = document.getElementById('deleteChallengeForm');
+            form.action = '/delete_challenge/' + challengeId + '/'; // Update the form action URL
+        });
+    });
+    
+    
+</script>
+
+        

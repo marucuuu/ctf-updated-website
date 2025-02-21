@@ -1,0 +1,155 @@
+{% load static %}
+
+<!-- Edit Lesson Modal -->
+<div class="modal fade" id="editLessonModal" tabindex="-1" aria-labelledby="editLessonModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg"> <!-- Use Bootstrap's built-in large size or a custom class -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editLessonModalLabel">Edit Lesson</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editLessonForm" method="post" enctype="multipart/form-data" action="{% url 'edit_lesson' %}" novalidate>
+                    {% csrf_token %}
+                    <input type="hidden" name="lesson_id" id="editLessonId">
+                    
+                    <div class="mb-3">
+                        <label for="editLessonName" class="form-label">Name <span class="text-danger">*</span></label>
+                        <textarea class="form-control tinymce-editor" id="editLessonName" name="name" required></textarea>
+                    </div>
+                
+                    <div class="mb-3">
+                        <label for="editLessonCategory" class="form-label">Category</label>
+                        <select class="form-control" id="editLessonCategory" name="category" required>
+                            <option value="general">General</option>
+                            <option value="osint">Open Source Intelligence</option>
+                            <option value="cryptography">Cryptography</option>
+                            <option value="forensics">Forensics</option>
+                        </select>
+                    </div>
+                
+                    <div class="mb-3">
+                        <label for="editLessonDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="editLessonDescription" name="description" rows="3"></textarea>
+                    </div>
+                
+                    <div class="mb-3">
+                        <label for="editLessonContent" class="form-label">Content <span class="text-danger">*</span></label>
+                        <textarea name="content" id="editLessonContent" class="tinymce-editor" required></textarea> <!-- Change to a textarea for TinyMCE -->
+                    </div>
+                
+                    <div class="mb-3">
+                        <label for="editLessonFile" class="form-label">File</label>
+                        <input type="file" class="form-control" id="editLessonFile" name="file">
+                    </div>
+                
+                    <div class="mb-3">
+                        <label for="editLessonPublishDate" class="form-label">Publish Date</label>
+                        <input type="date" class="form-control" id="editLessonPublishDate" name="publish_date" required>
+                    </div>
+                
+                    <div class="mb-3 form-check ms-1">
+                        <input type="checkbox" class="form-check-input ms-1" id="editLessonVisible" name="visible">
+                        <label class="form-check-label" for="editLessonVisible">Visible</label>
+                    </div>
+                
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    
+    <!-- Delete Lesson Modal -->
+<div class="modal fade" id="deleteLessonModal" tabindex="-1" aria-labelledby="deleteLessonModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form method="post" action="{% url 'delete_lesson' %}">
+            {% csrf_token %}
+            <input type="hidden" name="lesson_id" id="deleteLessonId">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteLessonModalLabel">Delete Lesson</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this lesson?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize TinyMCE editor for editing lesson content and name
+            tinymce.init({
+                selector: '.tinymce-editor',
+                plugins: [
+                    'link lists table image wordcount'
+                ],
+                toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright | link image | bullist numlist | removeformat',
+                setup: function (editor) {
+                    editor.on('change', function () {
+                        editor.save(); // Automatically save the content into the textarea
+                    });
+                }
+            });
+        
+            // Modal event for editLessonModal
+            var editLessonModal = document.getElementById('editLessonModal');
+            editLessonModal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget; // Button that triggered the modal
+        
+                // Extract data from the button
+                var lessonId = button.getAttribute('data-lesson-id');
+                var lessonName = button.getAttribute('data-lesson-name');
+                var lessonCategory = button.getAttribute('data-lesson-category');
+                var lessonContent = button.getAttribute('data-lesson-content');
+                var lessonDescription = button.getAttribute('data-lesson-description');
+                var lessonPublishDate = button.getAttribute('data-lesson-publish-date'); // Ensure this is YYYY-MM-DD
+                var lessonVisible = button.getAttribute('data-lesson-visible') === 'True';
+        
+                // Populate the modal fields with the data from the button
+                var modal = this;
+                modal.querySelector('#editLessonId').value = lessonId;
+        
+                // Set TinyMCE editor content for the name field
+                tinymce.get('editLessonName').setContent(lessonName);
+        
+                // Set the selected category in the dropdown
+                var categoryDropdown = modal.querySelector('#editLessonCategory');
+                for (var i = 0; i < categoryDropdown.options.length; i++) {
+                    if (categoryDropdown.options[i].value === lessonCategory) {
+                        categoryDropdown.selectedIndex = i;
+                        break;
+                    }
+                }
+        
+                modal.querySelector('#editLessonDescription').value = lessonDescription;
+                modal.querySelector('#editLessonPublishDate').value = lessonPublishDate; // Set the date
+                modal.querySelector('#editLessonVisible').checked = lessonVisible;
+        
+                // Set TinyMCE editor content for the content field
+                tinymce.get('editLessonContent').setContent(lessonContent);
+            });
+        
+            // Modal event for deleteLessonModal
+            var deleteLessonModal = document.getElementById('deleteLessonModal');
+            deleteLessonModal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget;
+                var lessonId = button.getAttribute('data-lesson-id');
+        
+                var modal = this;
+                modal.querySelector('#deleteLessonId').value = lessonId;
+            });
+        });        
+    </script>   
+    
+
+    {% include 'tinymce/api.html'%}
