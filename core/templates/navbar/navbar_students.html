@@ -39,11 +39,6 @@
                     <i class="bi bi-person-circle"></i> Profile Settings
                 </a>
             </li>
-            <li>
-                <a href="{% url 'faqs' %}">
-                    <i class="bi bi-question-circle"></i> FAQ's
-                </a>
-            </li>
             <li class="mt-auto">
                 <form method="POST" action="{% url 'logout' %}" class="d-inline">
                     {% csrf_token %}

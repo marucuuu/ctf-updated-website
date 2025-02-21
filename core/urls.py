@@ -21,10 +21,6 @@ urlpatterns = [
 
     path('change_password_temporary/', views.change_password_temporary, name='change_password_temporary'),
 
-
-    path('faqs/', views.faqs, name='faqs'),
-
-
     path('student_dashboard/', views.student_dashboard, name='student_dashboard'),
     path('submission-data/', views.get_submission_data, name='submission_data'),  # New URL
 
