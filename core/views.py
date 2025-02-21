@@ -1122,7 +1122,51 @@ def login_view(request):
 # LOGIN VIEW END
 
 
+# REGISTER VIEW START
 
+def register_student(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        section = request.POST.get('section', '').upper()  # Convert to uppercase
+
+        errors = []
+
+        # Check if username or email already exists
+        if User.objects.filter(username=username).exists():
+            errors.append('Username already exists.')
+        if User.objects.filter(email=email).exists():
+            errors.append('Email address already exists.')
+
+        if errors:
+            for error in errors:
+                messages.error(request, error)
+        else:
+            temp_password = generate_temporary_password()  # Generate a temporary password
+
+            # Create student user
+            user = User.objects.create(
+                username=username,
+                email=email,
+                password=make_password(temp_password)
+            )
+            UserProfile.objects.create(
+                user=user,
+                role='student',
+                verified=False,  # Students need verification
+                must_change_password=True,
+                section=section
+            )
+
+            send_welcome_email(user, temp_password)  # Send login details via email
+
+            messages.success(request, 'Registration successful! Check your email for login details.')
+            return redirect('login')
+
+    return render(request, 'register.html')
+
+
+# REGISTER VIEW END
 
 
 

@@ -20,6 +20,7 @@ class AuthTemporaryPasswordAndVerificationMiddleware(MiddlewareMixin):
             reverse('verify'),  # Account verification view
             reverse('forgot_password'),  # Forgot password view
             reverse('setup'),
+            reverse('register'),
         ]
 
         # Allow reset password URLs dynamically
