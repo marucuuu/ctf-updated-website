@@ -33,7 +33,7 @@ ALLOWED_HOSTS = os.environ.get("ALLOWED_HOST").split(" ")
 
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://ctf-updated-website.onrender.com",  # Add your Render domain
+    "https://ctf-updated-website-hyh5.onrender.com",  # Add your Render domain
 ]
 
 # Application definition
