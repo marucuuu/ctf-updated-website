@@ -310,43 +310,7 @@
                                     </div>
                                 </div>
                                 <hr>
-
-                                <!-- Comparison Insight Section -->
-                                <div class="text-left mt-3">
-                                    {% if total_attempts == 0 and total_activities_attempted == 0 %}
-                                        <p class="text-secondary">
-                                            <i class="fas fa-info-circle"></i> No data available.
-                                        </p>
-                                    {% elif activity_performance_ratio > challenge_performance_ratio %}
-                                        <p class="text-success">
-                                            <i class="fas fa-thumbs-up"></i> Great job! Your activity performance is stronger than your challenge performance. 
-                                            Focus on practicing more challenges to balance your overall success.
-                                        </p>
-                                        <p class="text-info">
-                                            Consider reviewing strategies and solving past challenge problems to enhance your challenge performance.
-                                        </p>
-                                    {% elif activity_performance_ratio < challenge_performance_ratio %}
-                                        <p class="text-warning">
-                                            <i class="fas fa-exclamation-circle"></i> Your challenge performance is better than your activity responses. 
-                                            Improving activity performance could strengthen your foundational understanding.
-                                        </p>
-                                        <p class="text-info">
-                                            Try revisiting lessons and practicing more activities to enhance your understanding and accuracy.
-                                        </p>
-                                    {% else %}
-                                        <p class="text-primary">
-                                            <i class="fas fa-balance-scale"></i> Your performance is balanced between activities and challenges. 
-                                            Keep maintaining consistent progress in both areas to achieve excellence.
-                                        </p>
-                                    {% endif %}
-                                </div>
                             </div>
-
-
-
-
-
-
                         <!-- Toggle Button -->
                         <div class="text-center">
                             <button class="btn btn-primary toggle-table mt-3">View Activity Submission</button>

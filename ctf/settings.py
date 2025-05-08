@@ -18,18 +18,18 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("SECRET_KEY")
-#SECRET_KEY = get_random_secret_key
+#SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = get_random_secret_key
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG", "False") == "true"
-#DEBUG = True
+#DEBUG = os.environ.get("DEBUG", "False") == "true"
+DEBUG = True
 
 # Define your custom 404 error handler
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOST").split(" ")
-#ALLOWED_HOSTS = ['*']
+#ALLOWED_HOSTS = os.environ.get("ALLOWED_HOST").split(" ")
+ALLOWED_HOSTS = ['*']
 
 
 CSRF_TRUSTED_ORIGINS = [
@@ -110,8 +110,8 @@ DATABASES = {
     }
 }
 
-database_url = os.environ.get("DATABASE_URL")
-DATABASES["default"] = dj_database_url.parse(database_url)
+#database_url = os.environ.get("DATABASE_URL")
+#DATABASES["default"] = dj_database_url.parse(database_url)
 
 
 #DATABASES["default"] = dj_database_url.parse('postgresql://capture_t_flag_user:NnzPLKrieIR2GGT14AMIy6rIt1Bn4H70@dpg-cus3m5tds78s73ed5n50-a.singapore-postgres.render.com/capture_t_flag')
@@ -167,16 +167,16 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 # CHATGPT OPEN API CHATBOT
-OPENAI_API_KEY = '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'
+OPENAI_API_KEY = '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'
 
 # SYSTEM EMAIL
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'capture.flag2024@gmail.com'
-EMAIL_HOST_PASSWORD = 'xceulsbftevepsaf'  # Your generated app password
-DEFAULT_FROM_EMAIL = 'capture.flag2024@gmail.com'
+EMAIL_HOST_USER = 'capturetheflag2024@gmail.com'
+EMAIL_HOST_PASSWORD = 'ztdxuiqxegumovcu'  # Your generated app password
+DEFAULT_FROM_EMAIL = 'capturetheflag2024@gmail.com'
 
 
 #EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'capture.flag2024@gmail.com')
